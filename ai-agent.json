@@ -1,19 +1,426 @@
 {
   "schema_version": "v1",
-  "name_for_human": "EU Procurement Radar Alpha Data Feed",
-  "name_for_model": "eu_procurement_radar",
-  "description_for_human": "EU public tender search and details with Base USDC payments.",
-  "description_for_model": "Search European Union public procurement tenders by query text (up to 500 characters), CPV prefix (2-8 digits), minimum value in EUR, three-letter uppercase country code, and result limit (1-100, default 20). Retrieve full tender details by tender_id. Each successful paid request requires Base USDC (0.02 USDC); discover the current amount and enabled settlement methods at /.well-known/x402.json. On HTTP 402 inspect the payment challenge before authorizing payment.",
+  "name_for_human": "Multi-Feed x402 Agent Data Oracle",
+  "name_for_model": "multi_feed_x402_oracle",
+  "description_for_human": "Multi-Feed AI Agent Data Marketplace with Base USDC micropayments.",
+  "description_for_model": "Multi-Feed x402 Data Oracle for autonomous AI agents. Provides: 1) Clean web-page-to-Markdown extraction (/api/v1/x402/web/extract), 2) Real-time crypto spot prices and perpetual funding rates (/api/v1/x402/crypto/market), 3) Structured web search without external API keys (/api/v1/x402/web/search), 4) Live open coding bounties in USD/USDC (/api/v1/x402/bounties/feed), and 5) EU public procurement tenders (/api/v1/x402/query). Each successful paid request requires Base USDC micro-settlement; discover current pricing and settlement methods at /.well-known/x402.json.",
   "auth": {
     "type": "none"
   },
   "api": {
     "type": "openapi",
-    "url": "https://inside-petite-legacy-reduces.trycloudflare.com/openapi.json",
+    "url": "/openapi.json",
     "is_user_authenticated": false
   },
   "payment": {
-    "manifest": "https://inside-petite-legacy-reduces.trycloudflare.com/.well-known/x402.json",
+    "manifest": "/.well-known/x402.json",
     "required": true
+  },
+  "openapi": {
+    "openapi": "3.1.0",
+    "info": {
+      "title": "Multi-Feed x402 Agent Data Oracle",
+      "version": "2.0.0"
+    },
+    "servers": [
+      {
+        "url": "/"
+      }
+    ],
+    "paths": {
+      "/api/v1/x402/query": {
+        "post": {
+          "operationId": "queryProcurement",
+          "summary": "Search EU tenders by text, CPV prefix, minimum EUR value and country",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "query": {
+                      "default": "",
+                      "maxLength": 500,
+                      "title": "Query",
+                      "type": "string"
+                    },
+                    "cpv": {
+                      "anyOf": [
+                        {
+                          "pattern": "^\\d{2,8}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "title": "Cpv"
+                    },
+                    "min_value": {
+                      "anyOf": [
+                        {
+                          "minimum": 0,
+                          "type": "number"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "title": "Min Value"
+                    },
+                    "country": {
+                      "anyOf": [
+                        {
+                          "pattern": "^[A-Z]{3}$",
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": null,
+                      "title": "Country"
+                    },
+                    "limit": {
+                      "default": 20,
+                      "maximum": 100,
+                      "minimum": 1,
+                      "title": "Limit",
+                      "type": "integer"
+                    }
+                  },
+                  "title": "X402QueryRequest",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            }
+          }
+        }
+      },
+      "/api/v1/x402/tender/{tender_id}": {
+        "get": {
+          "operationId": "getProcurementTender",
+          "summary": "Read a tender by its identifier",
+          "parameters": [
+            {
+              "name": "tender_id",
+              "in": "path",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            },
+            "404": {
+              "description": "Tender not found; payment not consumed"
+            }
+          }
+        }
+      },
+      "/api/v1/x402/web/extract": {
+        "post": {
+          "operationId": "extractWebMarkdown",
+          "summary": "SSRF-safe web page to clean Markdown extractor for LLM context windows",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "url": {
+                      "description": "Target web URL to convert to clean Markdown",
+                      "maxLength": 2048,
+                      "minLength": 4,
+                      "title": "Url",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "url"
+                  ],
+                  "title": "X402WebExtractRequest",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            }
+          }
+        }
+      },
+      "/api/v1/x402/crypto/market": {
+        "post": {
+          "operationId": "getCryptoMarketData",
+          "summary": "Real-time spot price, 24h stats and perpetual funding rates",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "symbol": {
+                      "default": "BTC",
+                      "description": "Crypto asset symbol (e.g. BTC, ETH, SOL)",
+                      "maxLength": 16,
+                      "minLength": 1,
+                      "title": "Symbol",
+                      "type": "string"
+                    }
+                  },
+                  "title": "X402CryptoMarketRequest",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            }
+          }
+        }
+      },
+      "/api/v1/x402/web/search": {
+        "post": {
+          "operationId": "searchWeb",
+          "summary": "Organic web search returning clean structured JSON results",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "query": {
+                      "description": "Web search query string",
+                      "maxLength": 300,
+                      "minLength": 1,
+                      "title": "Query",
+                      "type": "string"
+                    },
+                    "limit": {
+                      "default": 5,
+                      "description": "Max search results to return",
+                      "maximum": 20,
+                      "minimum": 1,
+                      "title": "Limit",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "query"
+                  ],
+                  "title": "X402WebSearchRequest",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            }
+          }
+        }
+      },
+      "/api/v1/x402/bounties/feed": {
+        "post": {
+          "operationId": "getBountiesFeed",
+          "summary": "Live feed of open developer bounties in liquid currencies (USDC, USD, EUR)",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "min_reward_usd": {
+                      "default": 0.0,
+                      "description": "Minimum reward amount in USD/USDC",
+                      "minimum": 0.0,
+                      "title": "Min Reward Usd",
+                      "type": "number"
+                    },
+                    "currency": {
+                      "anyOf": [
+                        {
+                          "maxLength": 10,
+                          "type": "string"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "default": "USDC",
+                      "description": "Target currency (USDC, USD, EUR)",
+                      "title": "Currency"
+                    },
+                    "limit": {
+                      "default": 20,
+                      "description": "Max open bounties to return",
+                      "maximum": 100,
+                      "minimum": 1,
+                      "title": "Limit",
+                      "type": "integer"
+                    }
+                  },
+                  "title": "X402BountiesFeedRequest",
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Feed intelligence data after verified Base USDC payment",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object"
+                  }
+                }
+              }
+            },
+            "402": {
+              "description": "Payment required; inspect JSON detail and payment headers"
+            },
+            "409": {
+              "description": "Payment already consumed or reserved"
+            },
+            "422": {
+              "description": "Invalid input or validation blocked; payment not consumed"
+            },
+            "502": {
+              "description": "Upstream feed retrieval failed"
+            },
+            "503": {
+              "description": "Verification unavailable; reconcile pending payments before retrying"
+            }
+          }
+        }
+      }
+    }
   }
 }

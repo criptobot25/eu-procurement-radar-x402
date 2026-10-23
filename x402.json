@@ -1,6 +1,7 @@
 {
   "schemaVersion": "1.0",
   "protocol": "x402-receipt-eip712",
+  "x402Version": null,
   "network": "eip155:8453",
   "networkName": "base",
   "chainId": 8453,
@@ -15,16 +16,218 @@
     "amount": "0.02",
     "amountUnits": "20000"
   },
+  "accepts": [],
+  "settlementMethods": [
+    {
+      "id": "receipt-eip712",
+      "enabled": true,
+      "standard": false,
+      "proofType": "EIP-712",
+      "headers": [
+        "X-Payment-Challenge",
+        "X-Payment-Proof"
+      ],
+      "instructions": "Transfer USDC on Base, then sign challenge typed_data with the mined txHash. Send proof JSON {signature,tx_hash}. challenge_id is the receipt challenge nonce."
+    },
+    {
+      "id": "exact-eip3009",
+      "enabled": false,
+      "standard": true,
+      "x402Version": 2,
+      "scheme": "exact",
+      "proofType": "EIP-3009",
+      "signatureType": "EIP-712",
+      "headers": [
+        "PAYMENT-REQUIRED",
+        "PAYMENT-SIGNATURE",
+        "PAYMENT-RESPONSE"
+      ],
+      "instructions": "Sign a USDC TransferWithAuthorization with a fresh bytes32 nonce; submit base64 JSON in PAYMENT-SIGNATURE for facilitator settlement."
+    }
+  ],
   "endpoints": [
     {
       "method": "POST",
       "path": "/api/v1/x402/query",
-      "summary": "Search EU public tenders by text, CPV code, min value EUR, or country"
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "default": "",
+            "maxLength": 500,
+            "title": "Query",
+            "type": "string"
+          },
+          "cpv": {
+            "anyOf": [
+              {
+                "pattern": "^\\d{2,8}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Cpv"
+          },
+          "min_value": {
+            "anyOf": [
+              {
+                "minimum": 0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Min Value"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z]{3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Country"
+          },
+          "limit": {
+            "default": 20,
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "X402QueryRequest",
+        "type": "object"
+      }
     },
     {
       "method": "GET",
       "path": "/api/v1/x402/tender/{tender_id}",
-      "summary": "Retrieve complete tender specifications and buyer documents"
+      "inputSchema": {
+        "type": "object",
+        "required": [
+          "tender_id"
+        ],
+        "properties": {
+          "tender_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/x402/web/extract",
+      "inputSchema": {
+        "properties": {
+          "url": {
+            "description": "Target web URL to convert to clean Markdown",
+            "maxLength": 2048,
+            "minLength": 4,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "X402WebExtractRequest",
+        "type": "object"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/x402/crypto/market",
+      "inputSchema": {
+        "properties": {
+          "symbol": {
+            "default": "BTC",
+            "description": "Crypto asset symbol (e.g. BTC, ETH, SOL)",
+            "maxLength": 16,
+            "minLength": 1,
+            "title": "Symbol",
+            "type": "string"
+          }
+        },
+        "title": "X402CryptoMarketRequest",
+        "type": "object"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/x402/web/search",
+      "inputSchema": {
+        "properties": {
+          "query": {
+            "description": "Web search query string",
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Query",
+            "type": "string"
+          },
+          "limit": {
+            "default": 5,
+            "description": "Max search results to return",
+            "maximum": 20,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "X402WebSearchRequest",
+        "type": "object"
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/x402/bounties/feed",
+      "inputSchema": {
+        "properties": {
+          "min_reward_usd": {
+            "default": 0.0,
+            "description": "Minimum reward amount in USD/USDC",
+            "minimum": 0.0,
+            "title": "Min Reward Usd",
+            "type": "number"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "maxLength": 10,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": "USDC",
+            "description": "Target currency (USDC, USD, EUR)",
+            "title": "Currency"
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max open bounties to return",
+            "maximum": 100,
+            "minimum": 1,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "X402BountiesFeedRequest",
+        "type": "object"
+      }
     }
-  ]
+  ],
+  "agentManifest": "/.well-known/ai-agent.json"
 }

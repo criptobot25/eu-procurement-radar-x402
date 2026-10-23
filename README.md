@@ -26,7 +26,7 @@
 |---|---|
 | **Network** | Base L2 (`eip155:8453`) |
 | **Token Contract** | `0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913` (USDC on Base) |
-| **Receiver Address** | `0x53034d57d66c0Ce3635F04AF924603d5ef349475` |
+| **Receiver Address** | `0xc0631209FB3d3B718d8842BC987320e6CBF7F664` |
 | **Price per Query** | **0.02 USDC** (`20,000` base units / 6 decimals) |
 | **Settlement Protocol** | `x402-receipt-eip712` / EIP-3009 exact transfer |
 
@@ -43,7 +43,7 @@ sequenceDiagram
 
     Agent->>Radar: POST /api/v1/x402/query {"query": "cybersecurity"}
     Radar-->>Agent: HTTP 402 Payment Required + EIP-712 Challenge JSON
-    Agent->>Base: Transfer 0.02 USDC to 0x5303...9475
+    Agent->>Base: Transfer 0.02 USDC to 0xc063...F664
     Base-->>Agent: Mined Transaction Hash (txHash)
     Agent->>Agent: Sign Challenge typed_data with Sender Wallet Key
     Agent->>Radar: POST /api/v1/x402/query (Headers: X-Payment-Challenge, X-Payment-Proof)

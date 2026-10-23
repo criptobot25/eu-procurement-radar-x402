@@ -1,0 +1,30 @@
+{
+  "schemaVersion": "1.0",
+  "protocol": "x402-receipt-eip712",
+  "network": "eip155:8453",
+  "networkName": "base",
+  "chainId": 8453,
+  "token": {
+    "symbol": "USDC",
+    "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "decimals": 6
+  },
+  "payTo": "0x53034d57d66c0Ce3635F04AF924603d5ef349475",
+  "price": {
+    "currency": "USDC",
+    "amount": "0.02",
+    "amountUnits": "20000"
+  },
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/api/v1/x402/query",
+      "summary": "Search EU public tenders by text, CPV code, min value EUR, or country"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/x402/tender/{tender_id}",
+      "summary": "Retrieve complete tender specifications and buyer documents"
+    }
+  ]
+}

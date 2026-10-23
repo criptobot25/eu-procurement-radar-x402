@@ -1,0 +1,19 @@
+{
+  "schema_version": "v1",
+  "name_for_human": "EU Procurement Radar Alpha Data Feed",
+  "name_for_model": "eu_procurement_radar",
+  "description_for_human": "EU public tender search and details with Base USDC payments.",
+  "description_for_model": "Search European Union public procurement tenders by query text (up to 500 characters), CPV prefix (2-8 digits), minimum value in EUR, three-letter uppercase country code, and result limit (1-100, default 20). Retrieve full tender details by tender_id. Each successful paid request requires Base USDC (0.02 USDC); discover the current amount and enabled settlement methods at /.well-known/x402.json. On HTTP 402 inspect the payment challenge before authorizing payment.",
+  "auth": {
+    "type": "none"
+  },
+  "api": {
+    "type": "openapi",
+    "url": "https://inside-petite-legacy-reduces.trycloudflare.com/openapi.json",
+    "is_user_authenticated": false
+  },
+  "payment": {
+    "manifest": "https://inside-petite-legacy-reduces.trycloudflare.com/.well-known/x402.json",
+    "required": true
+  }
+}

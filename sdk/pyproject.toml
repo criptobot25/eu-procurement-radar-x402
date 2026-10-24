@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "x402-data-oracle"
+version = "1.0.0"
+description = "Multi-Feed HTTP 402 Pay-Per-Query Data Oracle for Autonomous AI Agents on Base L2 USDC"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "Antigravity Quant Desk", email = "quant@antigravity.desk"}
+]
+keywords = ["x402", "agentkit", "coinbase", "ai-agents", "oracle", "base", "usdc", "micropayments"]
+dependencies = [
+    "httpx>=0.25.0",
+    "pydantic>=2.0.0"
+]

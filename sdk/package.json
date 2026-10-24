@@ -1,0 +1,27 @@
+{
+  "name": "@antigravity/x402-oracle",
+  "version": "1.0.0",
+  "description": "Multi-Feed HTTP 402 Data Oracle for AI Agents on Base L2 USDC",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "x402",
+    "oracle",
+    "elizaos",
+    "ai-agent",
+    "agentkit",
+    "coinbase",
+    "base",
+    "usdc",
+    "micropayments"
+  ],
+  "author": "Antigravity Quant Desk",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}
